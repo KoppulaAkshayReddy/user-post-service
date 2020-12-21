@@ -9,7 +9,7 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.akshay.rest.webservices</groupId>
-	<artifactId>user-post-service</artifactId>
+	<artifactId>user-post</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>user-post-service</name>
 	<description>Information about users and user&apos;s post</description>

@@ -1,4 +1,4 @@
-package com.akshay.rest.webservices.userpostservice;
+package com.akshay.rest.webservices.userpost;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
