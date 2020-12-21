@@ -3,6 +3,8 @@ package com.akshay.rest.webservices.userpost.controller;
 import java.net.URI;
 import java.util.List;
 
+import javax.validation.Valid;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -35,7 +37,7 @@ public class UserController {
 	
 	// return - 201 created status and the created URI
 	@PostMapping("/users")
-	public ResponseEntity<Object> create(@RequestBody User user) {
+	public ResponseEntity<Object> create(@Valid @RequestBody User user) {
 		User savedUser = service.save(user);
 		URI location = ServletUriComponentsBuilder.
 				fromCurrentRequest()
@@ -45,7 +47,7 @@ public class UserController {
 	}
 	
 	@PutMapping("/users/{id}")
-	public User update(@PathVariable int id, @RequestBody User user) {
+	public User update(@PathVariable int id, @Valid @RequestBody User user) {
 		return service.update(id, user);
 	}
 	

@@ -2,16 +2,24 @@ package com.akshay.rest.webservices.userpost.entity;
 
 import java.util.Date;
 
+import javax.validation.constraints.Email;
+import javax.validation.constraints.Past;
+import javax.validation.constraints.Size;
+
 public class User {
 	
 	private int id;
 	
+	@Size(min=2, message="First name should have atleast 2 characters")
 	private String firstName;
 	
+	@Size(min=2, message="Last name should have atleast 2 characters")
 	private String lastName;
 	
+	@Email
 	private String email;
 	
+	@Past
 	private Date birthDate;
 	
 
