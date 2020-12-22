@@ -6,20 +6,27 @@ import javax.validation.constraints.Email;
 import javax.validation.constraints.Past;
 import javax.validation.constraints.Size;
 
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
+
+@ApiModel(description="Details about the user.")
 public class User {
 	
 	private int id;
 	
 	@Size(min=2, message="First name should have atleast 2 characters")
+	@ApiModelProperty(notes="First name should have atleast 2 characters")
 	private String firstName;
 	
 	@Size(min=2, message="Last name should have atleast 2 characters")
+	@ApiModelProperty(notes="Last name should have atleast 2 characters")
 	private String lastName;
 	
 	@Email
 	private String email;
 	
 	@Past
+	@ApiModelProperty(notes="Birth date should be in the past")
 	private Date birthDate;
 	
 
