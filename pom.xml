@@ -36,10 +36,12 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-hateoas</artifactId>
 		</dependency>
+		<!-- Disabled XML Support because browsers give preference to XML over JSON (They send Accept header with application/xml). 
+		However, I prefer seeing responses with JSON in the browser (For me REST = JSON)
 		<dependency>
 			<groupId>com.fasterxml.jackson.dataformat</groupId>
 			<artifactId>jackson-dataformat-xml</artifactId>
-		</dependency>
+		</dependency> -->
 
 
 		<dependency>
