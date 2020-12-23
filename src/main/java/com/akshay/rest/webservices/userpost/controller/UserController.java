@@ -4,6 +4,7 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 import java.net.URI;
+import java.util.Date;
 import java.util.List;
 
 import javax.validation.Valid;
@@ -25,6 +26,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.akshay.rest.webservices.userpost.entity.User;
+import com.akshay.rest.webservices.userpost.entity.UserVersion2;
 import com.akshay.rest.webservices.userpost.service.UserService;
 import com.fasterxml.jackson.databind.ser.FilterProvider;
 import com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter;
@@ -96,4 +98,30 @@ public class UserController {
 		return filters;
 	}
 	
+	/* #### Test versioning of RESTful service #### */
+	
+	
+	//URI versioning (Adv: easy caching, API documentation and execute on browser)
+	@GetMapping("v2/users")
+	public UserVersion2 findAllV2() {
+		return new UserVersion2(1, "Akshay Reddy", "akshayreddy@gmail.com", "pwd", new Date());
+	}
+	
+	// Parameter versioning (Adv: easy caching, API documentation and execute on browser)
+	@GetMapping(value="/users", params = "version=2")
+	public UserVersion2 findAllV2Params() {
+		return new UserVersion2(1, "Akshay Reddy", "akshayreddy@gmail.com", "pwd", new Date());
+	}
+	
+	// Custom headers versioning (Adv: no URI pollution)
+	@GetMapping(value="/users", headers = "API-VERSION=2")
+	public UserVersion2 findAllV2Headers() {
+		return new UserVersion2(1, "Akshay Reddy", "akshayreddy@gmail.com", "pwd", new Date());
+	}
+	
+	// Accept header or content negotiation versioning (Adv: no URI pollution)
+	@GetMapping(value="/users", produces = "application/user-v2+json")
+	public UserVersion2 findAllVersion2() {
+		return new UserVersion2(1, "Akshay Reddy", "akshayreddy@gmail.com", "pwd", new Date());
+	}
 }
