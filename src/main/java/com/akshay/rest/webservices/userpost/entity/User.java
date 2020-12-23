@@ -6,6 +6,8 @@ import javax.validation.constraints.Email;
 import javax.validation.constraints.Past;
 import javax.validation.constraints.Size;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
@@ -25,17 +27,20 @@ public class User {
 	@Email
 	private String email;
 	
+	@JsonIgnore
+	private String password;
+	
 	@Past
 	@ApiModelProperty(notes="Birth date should be in the past")
 	private Date birthDate;
-	
 
-	public User(int id, String firstName, String lastName, String email, Date birthDate) {
+	public User(int id, String firstName, String lastName, String email, String password, Date birthDate) {
 		super();
 		this.id = id;
 		this.firstName = firstName;
 		this.lastName = lastName;
 		this.email = email;
+		this.password = password;
 		this.birthDate = birthDate;
 	}
 
@@ -69,6 +74,14 @@ public class User {
 
 	public void setEmail(String email) {
 		this.email = email;
+	}
+	
+	public String getPassword() {
+		return password;
+	}
+
+	public void setPassword(String password) {
+		this.password = password;
 	}
 
 	public Date getBirthDate() {

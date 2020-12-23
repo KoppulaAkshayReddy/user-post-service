@@ -16,10 +16,10 @@ public class UserService {
 	private static List<User> users = new ArrayList<>();
 	
 	static {
-		users.add(new User(1, "AKshay", "Reddy", "rakshay@gmail.com", new Date()));
-		users.add(new User(2, "AKshay", "Reddy", "rakshay@gmail.com", new Date()));
-		users.add(new User(3, "AKshay", "Reddy", "rakshay@gmail.com", new Date()));
-		users.add(new User(4, "AKshay", "Reddy", "rakshay@gmail.com", new Date()));
+		users.add(new User(1, "AKshay", "Reddy", "rakshay@gmail.com", "password1", new Date()));
+		users.add(new User(2, "AKshay", "Reddy", "rakshay@gmail.com", "password2", new Date()));
+		users.add(new User(3, "AKshay", "Reddy", "rakshay@gmail.com", "password3", new Date()));
+		users.add(new User(4, "AKshay", "Reddy", "rakshay@gmail.com", "password4", new Date()));
 	}
 	
 	private static int autoId = 5;
