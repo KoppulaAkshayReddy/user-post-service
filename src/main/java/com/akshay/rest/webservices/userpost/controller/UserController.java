@@ -14,6 +14,7 @@ import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.json.MappingJacksonValue;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -25,6 +26,9 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.akshay.rest.webservices.userpost.entity.User;
 import com.akshay.rest.webservices.userpost.service.UserService;
+import com.fasterxml.jackson.databind.ser.FilterProvider;
+import com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter;
+import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
 
 @RestController
 public class UserController {
@@ -36,12 +40,15 @@ public class UserController {
 	private MessageSource messageSource;
 
 	@GetMapping("/users")
-	public List<User> findAll() {
-		return service.findAll();
+	public MappingJacksonValue findAll() {
+		List<User> users = service.findAll();
+		MappingJacksonValue mapping = new MappingJacksonValue(users);
+		mapping.setFilters(getUserBeanFilters());
+		return mapping;
 	}
 	
 	@GetMapping("users/{id}")
-	public EntityModel<User> findById(@PathVariable int id) {
+	public MappingJacksonValue findById(@PathVariable int id) {
 		User user = service.findById(id);
 		
 		// HATEOS (hypermedia as the engine of applications)
@@ -49,7 +56,10 @@ public class UserController {
 		EntityModel<User> resource = EntityModel.of(user);
 		WebMvcLinkBuilder linkTo = linkTo(methodOn(this.getClass()).findAll());
 		resource.add(linkTo.withRel("all-users"));
-		return resource;
+		
+		MappingJacksonValue mapping = new MappingJacksonValue(resource);
+		mapping.setFilters(getUserBeanFilters());
+		return mapping;
 	}
 	
 	// return - 201 created status and the created URI
@@ -77,6 +87,13 @@ public class UserController {
 	@GetMapping("hello-i18n")
 	public String sayHello() {
 		return messageSource.getMessage("good.morning.message", null, LocaleContextHolder.getLocale());
+	}
+	
+	//Implement dynamic filtering for RESTful service
+	private FilterProvider getUserBeanFilters() {
+		SimpleBeanPropertyFilter filter = SimpleBeanPropertyFilter.filterOutAllExcept("id", "firstName", "lastName", "email", "birthDate");
+		FilterProvider filters = new SimpleFilterProvider().addFilter("UserBeanFilter", filter);
+		return filters;
 	}
 	
 }

@@ -6,12 +6,13 @@ import javax.validation.constraints.Email;
 import javax.validation.constraints.Past;
 import javax.validation.constraints.Size;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonFilter;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
 @ApiModel(description="Details about the user.")
+@JsonFilter("UserBeanFilter")
 public class User {
 	
 	private int id;
@@ -27,7 +28,6 @@ public class User {
 	@Email
 	private String email;
 	
-	@JsonIgnore
 	private String password;
 	
 	@Past
