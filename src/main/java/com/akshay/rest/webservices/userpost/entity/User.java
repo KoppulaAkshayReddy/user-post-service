@@ -2,6 +2,9 @@ package com.akshay.rest.webservices.userpost.entity;
 
 import java.util.Date;
 
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.Past;
 import javax.validation.constraints.Size;
@@ -13,8 +16,11 @@ import io.swagger.annotations.ApiModelProperty;
 
 @ApiModel(description="Details about the user.")
 @JsonFilter("UserBeanFilter")
+@Entity
 public class User {
 	
+	@Id
+	@GeneratedValue
 	private int id;
 	
 	@Size(min=2, message="First name should have atleast 2 characters")
