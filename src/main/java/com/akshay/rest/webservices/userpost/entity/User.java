@@ -39,6 +39,10 @@ public class User {
 	@Past
 	@ApiModelProperty(notes="Birth date should be in the past")
 	private Date birthDate;
+	
+	protected User() {
+		
+	}
 
 	public User(int id, String firstName, String lastName, String email, String password, Date birthDate) {
 		super();

@@ -1,81 +1,70 @@
 package com.akshay.rest.webservices.userpost.service;
 
-import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.akshay.rest.webservices.userpost.entity.User;
 import com.akshay.rest.webservices.userpost.exception.BadRequestException;
 import com.akshay.rest.webservices.userpost.exception.NotFoundException;
+import com.akshay.rest.webservices.userpost.repository.UserRepository;
 
 @Service
 public class UserService {
-
-	private static List<User> users = new ArrayList<>();
 	
-	static {
-		users.add(new User(1, "AKshay", "Reddy", "rakshay@gmail.com", "password1", new Date()));
-		users.add(new User(2, "AKshay", "Reddy", "rakshay@gmail.com", "password2", new Date()));
-		users.add(new User(3, "AKshay", "Reddy", "rakshay@gmail.com", "password3", new Date()));
-		users.add(new User(4, "AKshay", "Reddy", "rakshay@gmail.com", "password4", new Date()));
-	}
-	
-	private static int autoId = 5;
-	
+	@Autowired
+	private UserRepository userRepository;
 	
 	public List<User> findAll() {
-		return users;
+		return userRepository.findAll();
 	}
 	
 	public User findById(int id) {
-		for(User user : users) {
-			if(user.getId() == id) {
-				return user;
-			}
+		Optional<User> user = userRepository.findById(id);
+		
+		if(!user.isPresent()) {
+			throw new NotFoundException("User with id: " + id + " doesn't exist");
 		}
 		
-		throw new NotFoundException("User with id: " + id + " doesn't exist");
+		return user.get();
 	}
 	
 	public User save(User newUser) {
-		for(User user : users) {
-			if(user.getEmail().equals(newUser.getEmail())) {
-				throw new BadRequestException("User with email: " + newUser.getEmail() + " already exists");
-			}
+		Optional<User> user = userRepository.findByEmail(newUser.getEmail());
+		
+		if(user.isPresent()) {
+			throw new BadRequestException("User with email: " + newUser.getEmail() + " already exists");
 		}
-		newUser.setId(autoId++);
-		users.add(newUser);
+		
+		userRepository.save(newUser);
 		return newUser;
 	}
 	
-	public User update(int id, User updatedUser) {
-		for(User user : users) {
-			if(user.getId() == id) {
-				user.setFirstName(updatedUser.getFirstName());
-				user.setLastName(updatedUser.getLastName());
-				user.setEmail(updatedUser.getEmail());
-				user.setBirthDate(updatedUser.getBirthDate());
-				return user;
-			}
+	public void update(int id, User updateUser) {
+		Optional<User> user = userRepository.findById(id);
+		
+		if(!user.isPresent()) {
+			throw new NotFoundException("User with id: " + id + " doesn't exist");
 		}
 		
-		throw new NotFoundException("User with id: " + id + " doesn't exist");
+		user.get().setEmail(updateUser.getEmail());
+		user.get().setFirstName(updateUser.getFirstName());
+		user.get().setLastName(updateUser.getLastName());
+		user.get().setPassword(updateUser.getPassword());
+		user.get().setBirthDate(updateUser.getBirthDate());
+		userRepository.save(user.get());
 	}
 	
 	public void deleteById(int id) {
-		User deleteUser = null;
-		for(User user : users) {
-			if(user.getId() == id) {
-				deleteUser = user;
-			}
-		}
+		Optional<User> user = userRepository.findById(id);
 		
-		if(deleteUser == null) {
+		if(!user.isPresent()) {
 			throw new NotFoundException("User with id: " + id + " doesn't exist");
 		}
-	    users.remove(deleteUser);
+		
+		userRepository.deleteById(id);
 	}
  	
 }
