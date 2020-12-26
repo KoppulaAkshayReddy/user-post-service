@@ -31,7 +31,7 @@ public class UserService {
 		return user.get();
 	}
 	
-	public User save(User newUser) {
+	public void save(User newUser) {
 		Optional<User> user = userRepository.findByEmail(newUser.getEmail());
 		
 		if(user.isPresent()) {
@@ -39,7 +39,6 @@ public class UserService {
 		}
 		
 		userRepository.save(newUser);
-		return newUser;
 	}
 	
 	public void update(int id, User updateUser) {

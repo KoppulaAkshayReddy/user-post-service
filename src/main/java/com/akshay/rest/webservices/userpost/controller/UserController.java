@@ -25,8 +25,12 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import com.akshay.rest.webservices.userpost.entity.Post;
 import com.akshay.rest.webservices.userpost.entity.User;
 import com.akshay.rest.webservices.userpost.entity.UserVersion2;
+import com.akshay.rest.webservices.userpost.exception.BadRequestException;
+import com.akshay.rest.webservices.userpost.exception.NotFoundException;
+import com.akshay.rest.webservices.userpost.service.PostService;
 import com.akshay.rest.webservices.userpost.service.UserService;
 import com.fasterxml.jackson.databind.ser.FilterProvider;
 import com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter;
@@ -36,14 +40,17 @@ import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
 public class UserController {
 	
 	@Autowired
-	private UserService service;
+	private UserService userService;
+	
+	@Autowired
+	private PostService postService;
 	
 	@Autowired
 	private MessageSource messageSource;
 
 	@GetMapping("/users")
 	public MappingJacksonValue findAll() {
-		List<User> users = service.findAll();
+		List<User> users = userService.findAll();
 		MappingJacksonValue mapping = new MappingJacksonValue(users);
 		mapping.setFilters(getUserBeanFilters());
 		return mapping;
@@ -51,7 +58,7 @@ public class UserController {
 	
 	@GetMapping("users/{id}")
 	public MappingJacksonValue findById(@PathVariable int id) {
-		User user = service.findById(id);
+		User user = userService.findById(id);
 		
 		// HATEOS (hypermedia as the engine of applications)
 		// To add additional useful links to the User resource
@@ -67,22 +74,78 @@ public class UserController {
 	// return - 201 created status and the created URI
 	@PostMapping("/users")
 	public ResponseEntity<Object> create(@Valid @RequestBody User user) {
-		User savedUser = service.save(user);
+		userService.save(user);
 		URI location = ServletUriComponentsBuilder.
 				fromCurrentRequest()
 				.path("/{id}")
-				.buildAndExpand(savedUser.getId()).toUri();
+				.buildAndExpand(user.getId()).toUri();
 		return ResponseEntity.created(location).build();
 	}
 	
 	@PutMapping("/users/{id}")
 	public void update(@PathVariable int id, @Valid @RequestBody User user) {
-		service.update(id, user);
+		userService.update(id, user);
 	}
 	
 	@DeleteMapping("/users/{id}")
 	public void deleteById(@PathVariable int id) {
-		service.deleteById(id);
+		userService.deleteById(id);
+	}
+	
+	@GetMapping("/users/{id}/posts")
+	public List<Post> findUserPosts(@PathVariable int id) {
+		User user = userService.findById(id);
+		return user.getPosts();
+	}
+	
+	@GetMapping("/users/{id}/posts/{post-id}")
+	public Post findUserPostByPostId(@PathVariable int id, @PathVariable(name = "post-id") int postId) {
+		User user = userService.findById(id);
+		Post post = postService.findById(postId);
+		for(Post p : user.getPosts()) {
+			if(p.getId() == postId) {
+				return post;
+			}
+		}
+		throw new NotFoundException("The post (post id: " + postId + ") for user (user id: " + id + ") doesn't exist");
+	}
+	
+	@PostMapping("/users/{id}/posts")
+	public ResponseEntity<Object> createPost(@PathVariable int id, @RequestBody Post post) {
+		User user = userService.findById(id);
+		post.setUser(user);
+		postService.save(post);
+		URI location = ServletUriComponentsBuilder.
+				fromCurrentRequest()
+				.path("/{post-id}")
+				.buildAndExpand(post.getId()).toUri();
+		return ResponseEntity.created(location).build();
+	}
+	
+	@PutMapping("/users/{id}/posts/{post-id}")
+	public void update(@PathVariable int id, @PathVariable(name = "post-id") int postId, @RequestBody Post newPost) {
+		User user = userService.findById(id);
+		Post post = postService.findById(postId);
+		for(Post p : user.getPosts()) {
+			if(p.getId() == postId) {
+				postService.update(id, post, newPost);
+				return;
+			}
+		}
+		throw new BadRequestException("User (user id: " + id + ") cannot update post (post id: " + postId + ")");
+	}
+	
+	@DeleteMapping("/users/{id}/posts/{post-id}")
+	public void deleteById(@PathVariable int id, @PathVariable(name = "post-id") int postId) {
+		User user = userService.findById(id);
+		postService.findById(postId);
+		for(Post p : user.getPosts()) {
+			if(p.getId() == postId) {
+				postService.deleteById(postId);
+				return;
+			}
+		}
+		throw new BadRequestException("User (user id: " + id + ") cannot delete post (post id: " + postId + ")");
 	}
 	
 	// Internationalization
